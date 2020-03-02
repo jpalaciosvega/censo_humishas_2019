@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css"><link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/MarkerCluster.css">
+        <link rel="stylesheet" href="css/MarkerCluster.Default.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script><script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/multi-style-layer.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="js/leaflet.markercluster.js"></script>
+        <script src="data/Manzanasurbanas_3.js"></script>
+        <script src="data/Hidrografia_4.js"></script>
+        <script src="data/Lugardeprocedencia_5.js"></script>
+        <script src="data/Nombrescomunes_6.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        })
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
+        }
+        var layer_GoogleSatellite_0 = L.tileLayer('http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', {
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 18
+        });
+        layer_GoogleSatellite_0;
+        map.addLayer(layer_GoogleSatellite_0);
+        var layer_OpenStreetMap_1 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OpenStreetMap_1;
+        map.addLayer(layer_OpenStreetMap_1);
+        var layer_GoogleMaps_2 = L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}', {
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 18
+        });
+        layer_GoogleMaps_2;
+        map.addLayer(layer_GoogleMaps_2);
+        function pop_Manzanasurbanas_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OBJECTID'] !== null ? Autolinker.link(feature.properties['OBJECTID'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_STAr'] !== null ? Autolinker.link(feature.properties['Shape_STAr'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_STLe'] !== null ? Autolinker.link(feature.properties['Shape_STLe'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Leng'] !== null ? Autolinker.link(feature.properties['Shape_Leng'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Area'] !== null ? Autolinker.link(feature.properties['Shape_Area'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FUENTE'] !== null ? Autolinker.link(feature.properties['FUENTE'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CascoUrba'] !== null ? Autolinker.link(feature.properties['CascoUrba'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Altura'] !== null ? Autolinker.link(feature.properties['Altura'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        var pattern_Manzanasurbanas_3_0 = new L.StripePattern({
+            weight: 0.3,
+            spaceWeight: 2.0,
+            color: '#fb9a99',
+            opacity: 1.0,
+            spaceOpacity: 0,
+            angle: 315
+        });
+        pattern_Manzanasurbanas_3_0.addTo(map);
+        function style_Manzanasurbanas_3_0() {
+            return {
+                pane: 'pane_Manzanasurbanas_3',
+                stroke: false,
+                fillOpacity: 1,
+                fillPattern: pattern_Manzanasurbanas_3_0,
+                interactive: false,
+            }
+        }
+        var pattern_Manzanasurbanas_3_1 = new L.StripePattern({
+            weight: 0.3,
+            spaceWeight: 2.0,
+            color: '#fb9a99',
+            opacity: 1.0,
+            spaceOpacity: 0,
+            angle: 225
+        });
+        pattern_Manzanasurbanas_3_1.addTo(map);
+        function style_Manzanasurbanas_3_1() {
+            return {
+                pane: 'pane_Manzanasurbanas_3',
+                stroke: false,
+                fillOpacity: 1,
+                fillPattern: pattern_Manzanasurbanas_3_1,
+                interactive: false,
+            }
+        }
+        function style_Manzanasurbanas_3_2() {
+            return {
+                pane: 'pane_Manzanasurbanas_3',
+                opacity: 1,
+                color: 'rgba(240,139,23,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_Manzanasurbanas_3');
+        map.getPane('pane_Manzanasurbanas_3').style.zIndex = 403;
+        map.getPane('pane_Manzanasurbanas_3').style['mix-blend-mode'] = 'normal';
+        var layer_Manzanasurbanas_3 = new L.geoJson.multiStyle(json_Manzanasurbanas_3, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Manzanasurbanas_3',
+            layerName: 'layer_Manzanasurbanas_3',
+            pane: 'pane_Manzanasurbanas_3',
+            onEachFeature: pop_Manzanasurbanas_3,
+            styles: [style_Manzanasurbanas_3_0,style_Manzanasurbanas_3_1,style_Manzanasurbanas_3_2,]
+        });
+        bounds_group.addLayer(layer_Manzanasurbanas_3);
+        map.addLayer(layer_Manzanasurbanas_3);
+        function pop_Hidrografia_4(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LENGTH'] !== null ? Autolinker.link(feature.properties['LENGTH'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? Autolinker.link(feature.properties['ID'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FUENTE'] !== null ? Autolinker.link(feature.properties['FUENTE'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Hidrografia_4_0() {
+            return {
+                pane: 'pane_Hidrografia_4',
+                opacity: 1,
+                color: 'rgba(59,138,190,1.0)',
+                dashArray: '10,5',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_Hidrografia_4');
+        map.getPane('pane_Hidrografia_4').style.zIndex = 404;
+        map.getPane('pane_Hidrografia_4').style['mix-blend-mode'] = 'normal';
+        var layer_Hidrografia_4 = new L.geoJson(json_Hidrografia_4, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Hidrografia_4',
+            layerName: 'layer_Hidrografia_4',
+            pane: 'pane_Hidrografia_4',
+            onEachFeature: pop_Hidrografia_4,
+            style: style_Hidrografia_4_0,
+        });
+        bounds_group.addLayer(layer_Hidrografia_4);
+        map.addLayer(layer_Hidrografia_4);
+        function pop_Lugardeprocedencia_5(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Orden'] !== null ? Autolinker.link(feature.properties['Orden'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Distrito'] !== null ? Autolinker.link(feature.properties['Distrito'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Fecha'] !== null ? Autolinker.link(feature.properties['Fecha'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Responsabl'] !== null ? Autolinker.link(feature.properties['Responsabl'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Apoyo'] !== null ? Autolinker.link(feature.properties['Apoyo'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Tipo_de_v'] !== null ? Autolinker.link(feature.properties['Tipo_de_v'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Nombre_de'] !== null ? Autolinker.link(feature.properties['Nombre_de'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Insertado'] !== null ? Autolinker.link(feature.properties['Insertado'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Estado_cal'] !== null ? Autolinker.link(feature.properties['Estado_cal'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Profundida'] !== null ? Autolinker.link(feature.properties['Profundida'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Nombre_com'] !== null ? Autolinker.link(feature.properties['Nombre_com'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Especie'] !== null ? Autolinker.link(feature.properties['Especie'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Altura_tot'] !== null ? Autolinker.link(feature.properties['Altura_tot'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Circunfere'] !== null ? Autolinker.link(feature.properties['Circunfere'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lugar_proc'] !== null ? Autolinker.link(feature.properties['Lugar_proc'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Medio'] !== null ? Autolinker.link(feature.properties['Medio'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Costo'] !== null ? Autolinker.link(feature.properties['Costo'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['lon'] !== null ? Autolinker.link(feature.properties['lon'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['lat'] !== null ? Autolinker.link(feature.properties['lat'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Lugardeprocedencia_5_0(feature) {
+            switch(String(feature.properties['Lugar_proc'])) {
+                case 'chacra':
+                    return {
+                pane: 'pane_Lugardeprocedencia_5',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/landuse_deciduous.svg',
+            iconSize: [37.24, 37.24]
+        }),
+                interactive: true,
+            }
+                    break;
+                case 'huerta':
+                    return {
+                pane: 'pane_Lugardeprocedencia_5',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/landuse_deciduous.svg',
+            iconSize: [37.24, 37.24]
+        }),
+                interactive: true,
+            }
+                    break;
+                case 'mercado':
+                    return {
+                pane: 'pane_Lugardeprocedencia_5',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/landuse_deciduous.svg',
+            iconSize: [37.24, 37.24]
+        }),
+                interactive: true,
+            }
+                    break;
+                case 'NA':
+                    return {
+                pane: 'pane_Lugardeprocedencia_5',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/landuse_deciduous.svg',
+            iconSize: [37.24, 37.24]
+        }),
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Lugardeprocedencia_5');
+        map.getPane('pane_Lugardeprocedencia_5').style.zIndex = 405;
+        map.getPane('pane_Lugardeprocedencia_5').style['mix-blend-mode'] = 'normal';
+        var layer_Lugardeprocedencia_5 = new L.geoJson(json_Lugardeprocedencia_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Lugardeprocedencia_5',
+            layerName: 'layer_Lugardeprocedencia_5',
+            pane: 'pane_Lugardeprocedencia_5',
+            onEachFeature: pop_Lugardeprocedencia_5,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_Lugardeprocedencia_5_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Lugardeprocedencia_5);
+        map.addLayer(layer_Lugardeprocedencia_5);
+        function pop_Nombrescomunes_6(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Orden'] !== null ? Autolinker.link(feature.properties['Orden'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Distrito'] !== null ? Autolinker.link(feature.properties['Distrito'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Fecha'] !== null ? Autolinker.link(feature.properties['Fecha'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Responsabl'] !== null ? Autolinker.link(feature.properties['Responsabl'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Apoyo'] !== null ? Autolinker.link(feature.properties['Apoyo'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Tipo_de_v'] !== null ? Autolinker.link(feature.properties['Tipo_de_v'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Nombre_de'] !== null ? Autolinker.link(feature.properties['Nombre_de'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Insertado'] !== null ? Autolinker.link(feature.properties['Insertado'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Estado_cal'] !== null ? Autolinker.link(feature.properties['Estado_cal'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Profundida'] !== null ? Autolinker.link(feature.properties['Profundida'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Nombre_com'] !== null ? Autolinker.link(feature.properties['Nombre_com'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Especie'] !== null ? Autolinker.link(feature.properties['Especie'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Altura_tot'] !== null ? Autolinker.link(feature.properties['Altura_tot'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Circunfere'] !== null ? Autolinker.link(feature.properties['Circunfere'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lugar_proc'] !== null ? Autolinker.link(feature.properties['Lugar_proc'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Medio'] !== null ? Autolinker.link(feature.properties['Medio'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Costo'] !== null ? Autolinker.link(feature.properties['Costo'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['lon'] !== null ? Autolinker.link(feature.properties['lon'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['lat'] !== null ? Autolinker.link(feature.properties['lat'].toLocaleString(), {truncate: {length: 30, location: 'smart'}}) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Nombrescomunes_6_0(feature) {
+            switch(String(feature.properties['Nombre_com'])) {
+                case 'Cinamillo':
+                    return {
+                pane: 'pane_Nombrescomunes_6',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/landuse_deciduous.svg',
+            iconSize: [37.239999999999995, 37.239999999999995]
+        }),
+                interactive: true,
+            }
+                    break;
+                case 'Huacrapona':
+                    return {
+                pane: 'pane_Nombrescomunes_6',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/landuse_deciduous.svg',
+            iconSize: [37.239999999999995, 37.239999999999995]
+        }),
+                interactive: true,
+            }
+                    break;
+                case 'Huasai':
+                    return {
+                pane: 'pane_Nombrescomunes_6',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/landuse_deciduous.svg',
+            iconSize: [37.239999999999995, 37.239999999999995]
+        }),
+                interactive: true,
+            }
+                    break;
+                case 'Miami':
+                    return {
+                pane: 'pane_Nombrescomunes_6',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/landuse_deciduous.svg',
+            iconSize: [37.239999999999995, 37.239999999999995]
+        }),
+                interactive: true,
+            }
+                    break;
+                case 'Pona':
+                    return {
+                pane: 'pane_Nombrescomunes_6',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/landuse_deciduous.svg',
+            iconSize: [37.239999999999995, 37.239999999999995]
+        }),
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Nombrescomunes_6');
+        map.getPane('pane_Nombrescomunes_6').style.zIndex = 406;
+        map.getPane('pane_Nombrescomunes_6').style['mix-blend-mode'] = 'normal';
+        var layer_Nombrescomunes_6 = new L.geoJson(json_Nombrescomunes_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Nombrescomunes_6',
+            layerName: 'layer_Nombrescomunes_6',
+            pane: 'pane_Nombrescomunes_6',
+            onEachFeature: pop_Nombrescomunes_6,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_Nombrescomunes_6_0(feature));
+            },
+        });
+        var cluster_Nombrescomunes_6 = new L.MarkerClusterGroup({showCoverageOnHover: false,
+            spiderfyDistanceMultiplier: 2});
+        cluster_Nombrescomunes_6.addLayer(layer_Nombrescomunes_6);
+
+        bounds_group.addLayer(layer_Nombrescomunes_6);
+        cluster_Nombrescomunes_6.addTo(map);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'Nombres comunes<br /><table><tr><td style="text-align: center;"><img src="legend/Nombrescomunes_6_Cinamillo0.png" /></td><td>Cinamillo</td></tr><tr><td style="text-align: center;"><img src="legend/Nombrescomunes_6_Huacrapona1.png" /></td><td>Huacrapona</td></tr><tr><td style="text-align: center;"><img src="legend/Nombrescomunes_6_Huasai2.png" /></td><td>Huasai</td></tr><tr><td style="text-align: center;"><img src="legend/Nombrescomunes_6_Miami3.png" /></td><td>Miami</td></tr><tr><td style="text-align: center;"><img src="legend/Nombrescomunes_6_Pona4.png" /></td><td>Pona</td></tr></table>': cluster_Nombrescomunes_6,'Lugar de procedencia<br /><table><tr><td style="text-align: center;"><img src="legend/Lugardeprocedencia_5_chacra0.png" /></td><td>chacra</td></tr><tr><td style="text-align: center;"><img src="legend/Lugardeprocedencia_5_huerta1.png" /></td><td>huerta</td></tr><tr><td style="text-align: center;"><img src="legend/Lugardeprocedencia_5_mercado2.png" /></td><td>mercado</td></tr><tr><td style="text-align: center;"><img src="legend/Lugardeprocedencia_5_NA3.png" /></td><td>NA</td></tr></table>': layer_Lugardeprocedencia_5,'<img src="legend/Hidrografia_4.png" /> Hidrografia': layer_Hidrografia_4,'<img src="legend/Manzanasurbanas_3.png" /> Manzanas urbanas': layer_Manzanasurbanas_3,"Google Maps": layer_GoogleMaps_2,"OpenStreetMap": layer_OpenStreetMap_1,"Google Satellite": layer_GoogleSatellite_0,}).addTo(map);
+        setBounds();
+        </script>
+    </body>
+</html>
